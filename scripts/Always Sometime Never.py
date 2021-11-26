@@ -162,10 +162,12 @@ if __name__ == "__main__":
     # generate Erdos-Renyi random graph
     print("\nRunning simulation on Erdos-Renyi random graph")
     k_bar = A.sum() / len(A)
-    n = len(A)
-    p = k_bar / n
+    N = len(A)
+    p = k_bar / N
+    print(p)
 
-    G = nx.gnp_random_graph(n, p)
+    # G = nx.gnp_random_graph(N, 0.03268, seed=8888777)
+    G = nx.gnp_random_graph(N, p, seed=8888777)
     A = nx.convert_matrix.to_numpy_array(G)
     print(f"Mean degree: {A.sum(axis=0).mean()}")
 
