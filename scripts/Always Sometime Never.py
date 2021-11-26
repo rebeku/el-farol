@@ -142,9 +142,9 @@ if __name__ == "__main__":
     size=300
     n_iter = 1000
     eps = 0
-    M = 60
-    minfriends = 2
-    minbad = 5
+    M = 600
+    minfriends = 4
+    minbad = 4
     batch_size = 50
     
     # generate configuration model
