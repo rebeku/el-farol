@@ -158,13 +158,19 @@ if __name__ == "__main__":
 
     cnts_cm = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
     print(f"Not sometimes: {not_sometimes(cnts_cm)}")
-
+    print(f"Size of maximal fixed point: {cnts_cm.maximal_fixed_point.sum()}")
+    
+    plt.xlabel("Proportion of population attending")
+    plt.ylabel("Frequency")
+    plt.title("Configuration Model")
+    plt.hist((cnts_cm.sum(axis=0)[:50]/(951*300)),bins=20,range=(0,1))
+    plt.savefig("images/cm_attendance.png")
+    
     # generate Erdos-Renyi random graph
     print("\nRunning simulation on Erdos-Renyi random graph")
     k_bar = A.sum() / len(A)
     N = len(A)
     p = k_bar / N
-    print(p)
 
     # G = nx.gnp_random_graph(N, 0.03268, seed=8888777)
     G = nx.gnp_random_graph(N, p, seed=8888777)
@@ -173,6 +179,15 @@ if __name__ == "__main__":
 
     cnts_gnp = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
     print(f"Not sometimes: {not_sometimes(cnts_gnp)}")
+    print(f"Size of maximal fixed point: {cnts_gnp.maximal_fixed_point.sum()}")
+
+    plt.figure()
+    plt.hist((cnts_gnp.sum(axis=0)[:50]/(951*300)),bins=20,range=(0,1))
+    plt.xlabel("Proportion of population attending")
+    plt.ylabel("Frequency")
+    plt.title("Erdos Renyi")
+    plt.savefig("images/gnp_attendance.png")
+    
 
     print("\nRunning simulation on stochastic block model.")
     sizes = [100, 100, 100]
@@ -183,12 +198,21 @@ if __name__ == "__main__":
 
     cnts_sbm = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
     print(f"Not sometimes: {not_sometimes(cnts_sbm)}")
+    print(f"Size of maximal fixed point: {cnts_sbm.maximal_fixed_point.sum()}")
+
+    # plot weekly attendance
+    plt.figure()
+    plt.hist((cnts_sbm.sum(axis=0)[:50]/(951*300)),bins=20,range=(0,1))
+    plt.xlabel("Proportion of population attending")
+    plt.ylabel("Frequency")
+    plt.title("Stochastic Block Model")
+    plt.savefig("images/sbm_attendance.png")
 
     # generate plot
     always = ((cnts_gnp.Always > 0).sum(), (cnts_cm.Always > 0).sum(), (cnts_sbm.Always > 0).sum())
     sometimes = ((cnts_gnp.Sometimes > 0).sum(), (cnts_cm.Sometimes > 0).sum(), (cnts_sbm.Sometimes > 0).sum())
     never = ((cnts_gnp.Never > 0).sum(), (cnts_cm.Never > 0).sum(), (cnts_sbm.Never > 0).sum())
-
+    
     # create plot
     # fig, ax = plt.subplots()
     index = np.arange(3)
@@ -216,4 +240,46 @@ if __name__ == "__main__":
     plt.xticks(index + 2*bar_width, ('Erdos\nRenyi', 'Configuration\nModel', 'SBM'))
     plt.legend()
     plt.tight_layout()
-    plt.savefig("images/always_sometimes_never.png") 
+    plt.savefig("images/always_sometimes_never.png")
+
+
+    # plot members of the maximal fixed point only
+    cnts_gnp = cnts_gnp[cnts_gnp.maximal_fixed_point]
+    cnts_cm = cnts_cm[cnts_cm.maximal_fixed_point]
+    cnts_sbm = cnts_sbm[cnts_sbm.maximal_fixed_point]
+    
+    # generate plot
+    always = ((cnts_gnp.Always > 0).mean(), (cnts_cm.Always > 0).mean(), (cnts_sbm.Always > 0).mean())
+    sometimes = ((cnts_gnp.Sometimes > 0).mean(), (cnts_cm.Sometimes > 0).mean(), (cnts_sbm.Sometimes > 0).mean())
+    never = ((cnts_gnp.Never > 0).mean(), (cnts_cm.Never > 0).mean(), (cnts_sbm.Never > 0).mean())
+    
+    # create plot
+    # fig, ax = plt.subplots()
+    plt.figure()
+
+    index = np.arange(3)
+    bar_width = 0.3
+    opacity = 0.8
+
+    rects1 = plt.bar(index, always, bar_width,
+    alpha=opacity,
+    color='tab:green',
+    label='Always')
+
+    rects2 = plt.bar(index + bar_width, sometimes, bar_width,
+    alpha=opacity,
+    color='tab:orange',
+    label='Sometimes')
+
+    rects2 = plt.bar(index + 2*bar_width, never, bar_width,
+    alpha=opacity,
+    color='tab:red',
+    label='Never')
+
+    plt.xlabel('Random Graph')
+    plt.ylabel('Node Count')
+    plt.title('Attendance Patterns on Random Graph Models')
+    plt.xticks(index + 2*bar_width, ('Erdos\nRenyi', 'Configuration\nModel', 'SBM'))
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("images/always_sometimes_never_mfp.png")
