@@ -47,15 +47,15 @@ def run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
     # count the number of times each node goes to the bar
     # in each batch
     # skip first 50 rounds to give time to settle
-    attendance = [np.where(Xnp[:,50:]) for Xnp in Xnps]
+    attendance = [np.where(Xnp[:,51:]) for Xnp in Xnps]
     ppl = [pd.Series(a[0]) for a in attendance]
 
     cnts = pd.DataFrame(index=range(len(A)))
     for i in range(batch_size):
         cnts[i] = ppl[i].value_counts()
 
-    always = (cnts==n_iter - 49).mean(axis=1)
-    sometimes = (cnts < n_iter - 49).mean(axis=1)
+    always = (cnts==n_iter - 50).mean(axis=1)
+    sometimes = (cnts < n_iter - 50).mean(axis=1)
     never = cnts.isna().mean(axis=1)
 
     cnts["Always"] = always
@@ -134,6 +134,19 @@ def not_sometimes(cnts):
     return (maska & maskn & masks).sum()
 
 
+def plot_freq(cnts, title, fn):
+    plt.figure()
+    mfp = cnts.maximal_fixed_point.sum()
+    plt.hist((cnts.sum(axis=0)[:50]/(951*mfp)),bins=20,range=(0,1))
+    plt.xlabel("Proportion of population attending")
+    plt.ylabel("Frequency")
+    plt.title(title)
+    plt.savefig(fn)
+
+def mfp_freq(cnts):
+    return (cnts.sum(axis=0)[:50] == cnts.maximal_fixed_point.sum()).sum()
+
+
 if __name__ == "__main__":
 
     rng = np.random.default_rng(2357111)
@@ -159,12 +172,13 @@ if __name__ == "__main__":
     cnts_cm = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
     print(f"Not sometimes: {not_sometimes(cnts_cm)}")
     print(f"Size of maximal fixed point: {cnts_cm.maximal_fixed_point.sum()}")
+    print(f"Frequency of MFP: {mfp_freq(cnts_cm)}")
     
-    plt.xlabel("Proportion of population attending")
-    plt.ylabel("Frequency")
-    plt.title("Configuration Model")
-    plt.hist((cnts_cm.sum(axis=0)[:50]/(951*300)),bins=20,range=(0,1))
-    plt.savefig("images/cm_attendance.png")
+    plot_freq(cnts_cm, "Chung-Lu Model", "images/cm_attendance.png")
+    
+    # save table of attendance
+    print(cnts_cm.max().max())
+    (cnts_cm.sum(axis=0)[:50]/950).value_counts().sort_index().to_csv("data/cm.csv",header=False)
     
     # generate Erdos-Renyi random graph
     print("\nRunning simulation on Erdos-Renyi random graph")
@@ -180,14 +194,12 @@ if __name__ == "__main__":
     cnts_gnp = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
     print(f"Not sometimes: {not_sometimes(cnts_gnp)}")
     print(f"Size of maximal fixed point: {cnts_gnp.maximal_fixed_point.sum()}")
+    print(f"Frequency of MFP: {mfp_freq(cnts_gnp)}")
 
-    plt.figure()
-    plt.hist((cnts_gnp.sum(axis=0)[:50]/(951*300)),bins=20,range=(0,1))
-    plt.xlabel("Proportion of population attending")
-    plt.ylabel("Frequency")
-    plt.title("Erdos Renyi")
-    plt.savefig("images/gnp_attendance.png")
+    plot_freq(cnts_gnp, "Erdos-Renyi", "images/gnp_attendance.png")
     
+    # save table of attendance
+    (cnts_gnp.sum(axis=0)[:50]/950).value_counts().sort_index().to_csv("data/gnp.csv",header=False)
 
     print("\nRunning simulation on stochastic block model.")
     sizes = [100, 100, 100]
@@ -201,12 +213,10 @@ if __name__ == "__main__":
     print(f"Size of maximal fixed point: {cnts_sbm.maximal_fixed_point.sum()}")
 
     # plot weekly attendance
-    plt.figure()
-    plt.hist((cnts_sbm.sum(axis=0)[:50]/(951*300)),bins=20,range=(0,1))
-    plt.xlabel("Proportion of population attending")
-    plt.ylabel("Frequency")
-    plt.title("Stochastic Block Model")
-    plt.savefig("images/sbm_attendance.png")
+    plot_freq(cnts_sbm, "Stochastic Block Model", "images/sbm_attendance.png")
+
+    # save table of attendance
+    (cnts_sbm.sum(axis=0)[:50]/950).value_counts().sort_index().to_csv("data/sbm.csv",header=False)
 
     # generate plot
     always = ((cnts_gnp.Always > 0).sum(), (cnts_cm.Always > 0).sum(), (cnts_sbm.Always > 0).sum())
@@ -214,7 +224,7 @@ if __name__ == "__main__":
     never = ((cnts_gnp.Never > 0).sum(), (cnts_cm.Never > 0).sum(), (cnts_sbm.Never > 0).sum())
     
     # create plot
-    # fig, ax = plt.subplots()
+    plt.figure()
     index = np.arange(3)
     bar_width = 0.3
     opacity = 0.8
@@ -237,7 +247,7 @@ if __name__ == "__main__":
     plt.xlabel('Random Graph')
     plt.ylabel('Node Count')
     plt.title('Attendance Patterns on Random Graph Models')
-    plt.xticks(index + 2*bar_width, ('Erdos\nRenyi', 'Configuration\nModel', 'SBM'))
+    plt.xticks(index + 2*bar_width, ('Erdos\nRenyi', 'Chung\nLu', 'SBM'))
     plt.legend()
     plt.tight_layout()
     plt.savefig("images/always_sometimes_never.png")
