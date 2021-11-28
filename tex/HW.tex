@@ -72,16 +72,27 @@ TODO: Present MFP algo and show that sol'n is unique (or fuck off).
 TODO: Show that the 0 sol'n is unstable for Erdos-Renyi and configuration model.  Without an analytical description of nontrivial fixed points, it is difficult to understand whether they are stable.  BLABLA  
 
 \section{Deterministic Simulations}
-We can use numerical simulations to gain a stronger understanding of the steady state behavior of the system (if applicable).  We use three different well-understood random graph models: the Erdos-Renyi random graph, in which all possible edges exist with equal probability, the Chung-Lu model, which weights edge probabilitiies to obtain a target degree distribution, and the stochastic block model (SBM), in which the probabiliity of an edge is depends on its membership in a particular block.  Comparing the results on the Erdos-Renyi network vs. the Chung-Lu model, generated with a power law degree distribution, allows us to evaluate the impact of a heterogeneous degree distribution on the steady state of the system, while the SBM allows us to explore the impact of community structure.
+We can use numerical simulations to gain a stronger understanding of the steady state behavior of the system (if applicable).  We use three different well-understood random graph models: the Erdos-Renyi random graph, in which all possible edges exist with equal probability, the Chung-Lu model, which weights edge probabilitiies to obtain a target degree distribution, and the stochastic block model (SBM), in which the probabiliity of an edge is depends on its membership in a particular block.  Comparing the results on the Erdos-Renyi network vs. the Chung-Lu model, generated with a power law degree distribution, allows us to evaluate the impact of a heterogeneous degree distribution on the steady state of the system, while the SBM allows us to explore the impact of community structure.  The simulations were designed so that that the number of nodes and edges would be similar between the three models.  See Appendix for additional implentation details.
 
-TODO: Weekly attendance patterns
+Numerical simulations show that weekly attendance numbers reach a fixed point in most but not all trials.  However, even on the same network with the same number of agents attending at $t=0$, weekly attendance varies between trials.  In both the Erdos-Renyi and SBM simulations, some initial conditions (wiith 30\% of agents attending) led to no agents attending at steady state, while others led to attainment of the maximal fixed point.  In addition, there were intermediate states in which a fraction of the MFP attended while other members of the MFP never attended.  These intermediate states were much more frequent on the SBM versus the Erdos-Renyi model. 
+
+In contrast, the Chung-Lu model leads to much more stable results.  However, results are still not identical between trials.  For example, on a network of 300 agents, 141 attended in the steady state for 94\% of trials, while 142 attended the other 6\% of the time.  The MFP contained 153 nodes, and no trial attained the MFP.
+
+Figure BLAH summarizes  attendance
+
+\includegraphics[scale=0.7]{gnp_attendance.png}
+\includegraphics[scale=0.7]{cm_attendance.png}
+\includegraphics[scale=0.7]{sbm_attendance.png}
+
+In many simulations, the exact same group of agents attended every week, resulting in a true fixed point as described in Section 3.  However, all three experiments had some trials in which the composition of agents attending varied from week to week.  After discarding the first 50 timesteps of the simulation, some agents attended every timestep, some agents never attended, and, in many trials, some agents attended exactly half of the timesteps.  Further investigation revealed that agents attending alternate weeks were coupled to each other.  
+
+In the simplest scenario, a pair of agents ($A_1$ and $A_2$) are neighbors and each have $\ell - 1$ neighbors that always attend.  If agent $A_1$ attends at time $t$, while agent $A_2$ does not, then at time $t+1$, agent $A_2$ will attend, as it had $\ell$ neighbors attending at time $t$, while agent $A_1$ will not attend, as it had just $\ell - 1$ neighbors in attendance at time $t$.  Thus the two agents will toggle back and forth indefinitely, essentially caught in a game of telephone tag in which they miss running into each other at every timestep.  In some cases, more complex interactions occur.  While more agents may be involved, the cycles always have period 2.  
 
 \begin{center}
 \includegraphics[scale=0.7]{always_sometimes_never.png}
 \end{center}
-The 0 solution appears unstable.  Are these networks attaining the MFP?  Not if there are sometimes nodes.
 
-Description of telephone tag.
+Figure GORP shows the number distinct agents attending always, sometimes, or never in at least one trial for each of the three random graph models.  The figure shows the contrast between the Chung-Lu model with a heavy-tailed degree distribution, which has around half of the nodes in the Always and Never camp, and very few in Sometimes, compared with the Erdos-Renyi and stochastic block models, which have a much more variabiliity.  Almost all agents are occasionally in both the Always and Never groups depending on the trial, and many more agents attend sometimes.  These results suggest that more homogeneous degree distributions increase the probability of agents engaging in telephone tag behaviors, while contributing to more volatile results.  In contrast, the heavier-tailed degree distribution appears to have stabilizing influence on the outcome.
 
 \section{Analysis of Stability on Highly Structured Networks}
 

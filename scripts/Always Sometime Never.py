@@ -137,14 +137,15 @@ def not_sometimes(cnts):
 def plot_freq(cnts, title, fn):
     plt.figure()
     mfp = cnts.maximal_fixed_point.sum()
-    plt.hist((cnts.sum(axis=0)[:50]/(951*mfp)),bins=20,range=(0,1))
-    plt.xlabel("Proportion of population attending")
+    plt.hist((cnts.sum(axis=0)[:50]/(950*mfp)),bins=20,range=(0,1))
+    plt.xlabel("Proportion of MFP attending")
     plt.ylabel("Frequency")
     plt.title(title)
     plt.savefig(fn)
 
 def mfp_freq(cnts):
-    return (cnts.sum(axis=0)[:50] == cnts.maximal_fixed_point.sum()).sum()
+    mfp = cnts.maximal_fixed_point.sum()
+    return (cnts.sum(axis=0)[:50] / 950 == mfp).sum()
 
 
 if __name__ == "__main__":
@@ -211,6 +212,7 @@ if __name__ == "__main__":
     cnts_sbm = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
     print(f"Not sometimes: {not_sometimes(cnts_sbm)}")
     print(f"Size of maximal fixed point: {cnts_sbm.maximal_fixed_point.sum()}")
+    print(f"Frequency of MFP: {mfp_freq(cnts_sbm)}")
 
     # plot weekly attendance
     plot_freq(cnts_sbm, "Stochastic Block Model", "images/sbm_attendance.png")
@@ -219,9 +221,18 @@ if __name__ == "__main__":
     (cnts_sbm.sum(axis=0)[:50]/950).value_counts().sort_index().to_csv("data/sbm.csv",header=False)
 
     # generate plot
-    always = ((cnts_gnp.Always > 0).sum(), (cnts_cm.Always > 0).sum(), (cnts_sbm.Always > 0).sum())
-    sometimes = ((cnts_gnp.Sometimes > 0).sum(), (cnts_cm.Sometimes > 0).sum(), (cnts_sbm.Sometimes > 0).sum())
-    never = ((cnts_gnp.Never > 0).sum(), (cnts_cm.Never > 0).sum(), (cnts_sbm.Never > 0).sum())
+    always = (
+        (cnts_gnp.Always > 0).sum()/N, 
+        (cnts_cm.Always > 0).sum()/N, 
+        (cnts_sbm.Always > 0).sum()/N)
+    sometimes = (
+        (cnts_gnp.Sometimes > 0).sum()/N, 
+        (cnts_cm.Sometimes > 0).sum()/N, 
+        (cnts_sbm.Sometimes > 0).sum()/N)
+    never = (
+        (cnts_gnp.Never > 0).sum()/N, 
+        (cnts_cm.Never > 0).sum()/N, 
+        (cnts_sbm.Never > 0).sum()/N)
     
     # create plot
     plt.figure()
@@ -245,8 +256,8 @@ if __name__ == "__main__":
     label='Never')
 
     plt.xlabel('Random Graph')
-    plt.ylabel('Node Count')
-    plt.title('Attendance Patterns on Random Graph Models')
+    plt.ylabel('Fraction of Distinct Agents')
+    plt.title('Proportion of Population')
     plt.xticks(index + 2*bar_width, ('Erdos\nRenyi', 'Chung\nLu', 'SBM'))
     plt.legend()
     plt.tight_layout()
@@ -259,9 +270,18 @@ if __name__ == "__main__":
     cnts_sbm = cnts_sbm[cnts_sbm.maximal_fixed_point]
     
     # generate plot
-    always = ((cnts_gnp.Always > 0).mean(), (cnts_cm.Always > 0).mean(), (cnts_sbm.Always > 0).mean())
-    sometimes = ((cnts_gnp.Sometimes > 0).mean(), (cnts_cm.Sometimes > 0).mean(), (cnts_sbm.Sometimes > 0).mean())
-    never = ((cnts_gnp.Never > 0).mean(), (cnts_cm.Never > 0).mean(), (cnts_sbm.Never > 0).mean())
+    always = (
+        (cnts_gnp.Always > 0).mean(), 
+        (cnts_cm.Always > 0).mean(), 
+        (cnts_sbm.Always > 0).mean())
+    sometimes = (
+        (cnts_gnp.Sometimes > 0).mean(), 
+        (cnts_cm.Sometimes > 0).mean(), 
+        (cnts_sbm.Sometimes > 0).mean())
+    never = (
+        (cnts_gnp.Never > 0).mean(), 
+        (cnts_cm.Never > 0).mean(), 
+        (cnts_sbm.Never > 0).mean())
     
     # create plot
     # fig, ax = plt.subplots()
@@ -287,8 +307,8 @@ if __name__ == "__main__":
     label='Never')
 
     plt.xlabel('Random Graph')
-    plt.ylabel('Node Count')
-    plt.title('Attendance Patterns on Random Graph Models')
+    plt.ylabel('Fraction of Distinct Agents')
+    plt.title('Proportion of MFP')
     plt.xticks(index + 2*bar_width, ('Erdos\nRenyi', 'Configuration\nModel', 'SBM'))
     plt.legend()
     plt.tight_layout()
