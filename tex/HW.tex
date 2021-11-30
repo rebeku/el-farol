@@ -23,7 +23,16 @@
 Does network structure determine which agents will attend the bar in a modified El Farol Bar problem.  In most cases, the network does not appear to converge to a single stable fixed point, but rather oscillates around an attractor in which some agents always attend and others attend in alternating weeks.  
 
 \section{Introduction}
-Motivate El Farol bar problem.  Work with social networks.
+
+The El Farol Bar problem, named and popularized by Brian Arthur, is a stylized model in which agents attempt to utilize a limited resource while avoiding congestion \cite{arthur:1994}.  The name of the problem is inspired by a bar called El Farol in Santa Fe, which had a popular weekly event with live music.  Everyone enjoys the evening if the space is not overcrowded, but if too many people attend, everyone will have a worse time than if they had stayed home.  The El Farol bar problem differs from classical economic analyses of the tragedy of the commons by allowing agents to select their strategies inductively based on past performance over a period of time.
+
+In Arthur's original publication, each agent has access to a finite pool of fixed strategies, as well as weekly attendance history for the entire system.  At each timestep, the agent selects the strategy that would have led to the best performance over some recent time window.  Arthur and A WHOLE BUNCH OF OTHER PEOPLE have found in many different variants of this setup that weekly attendance will never completely stabilize but will oscillate around the congestion threshold.  While attendance is attracted to a certain range, the distribution of strategies amongst agents does not stabilize.  However, in simpler setups in which agents choose from just two or three strategies, the system will converge to a stable and predictable attractor depending on the initial strategy distribution \cite{stLuce:2020}.
+
+Scholars have motivated the importance of this problem with applications such as traffic and public transit congestion, internet traffic, and financial markets \cite{zambrano:2004} \cite{chen:2012}.  In these applications, modeling agents as behaving independently and attempting to optimize solely their own utility may be a reasonable model for empirical behaviors.  However, humans are social animals and in many situations, including the original story motivating the El Farol bar problem, agents may not only prefer to avoid crowding, but also prefer the company of friends.  Thus agents must balance two competing priorities, the need to coordinate with other members of a local neighborhood within a social network, and the need to avoid crowds.
+
+There are variants of the El Farol problem that use coordination between agents to allow agents a broader choice of optimal strategies, although in such cases group coordination leads to lower overall utility as groups sharing the same strategy drive overcrowding. \cite{collins:2017} \cite{wilensky:2015}.  In addition, a variant of the problem has agents in a social network where agents' choices to go to the bar depend on their neighbors' history.   When these simulations are run on very regular network structures, a range of diverse equilibria can occur \cite{chen:2012}.  However, the agents have no innate preference to attend with or without their neighbors.
+
+When agents prefer to attend with their neighbors, WRITE SOME STUFF about opinion modeling and the hipster effect.
 
 \section{Social Decision Function}
 To test the hypothesis that local differences in the structure of social networks can encode the diversity of strategies required to regulate attendance, we construct a simple scenario in which each agent chooses to attend the bar if at least $\ell$ of the agent's neighbors attended the previous week.  We define the attendance vector $\vec{y}(t)$ such that
@@ -69,36 +78,46 @@ In general, we cannot expect $S$ to be unique.  As a simple example, suppose the
 However, a finite network must have a unique maximal fixed point (MFP), in which every agent that could possibly be a member of $S$ is.  
 TODO: Present MFP algo and show that sol'n is unique (or fuck off). 
 
-TODO: Show that the 0 sol'n is unstable for Erdos-Renyi and configuration model.  Without an analytical description of nontrivial fixed points, it is difficult to understand whether they are stable.  BLABLA  
-
 \section{Deterministic Simulations}
 We can use numerical simulations to gain a stronger understanding of the steady state behavior of the system (if applicable).  We use three different well-understood random graph models: the Erdos-Renyi random graph, in which all possible edges exist with equal probability, the Chung-Lu model, which weights edge probabilitiies to obtain a target degree distribution, and the stochastic block model (SBM), in which the probabiliity of an edge is depends on its membership in a particular block.  Comparing the results on the Erdos-Renyi network vs. the Chung-Lu model, generated with a power law degree distribution, allows us to evaluate the impact of a heterogeneous degree distribution on the steady state of the system, while the SBM allows us to explore the impact of community structure.  The simulations were designed so that that the number of nodes and edges would be similar between the three models.  See Appendix for additional implentation details.
 
-Numerical simulations show that weekly attendance numbers reach a fixed point in most but not all trials.  However, even on the same network with the same number of agents attending at $t=0$, weekly attendance varies between trials.  In both the Erdos-Renyi and SBM simulations, some initial conditions (wiith 30\% of agents attending) led to no agents attending at steady state, while others led to attainment of the maximal fixed point.  In addition, there were intermediate states in which a fraction of the MFP attended while other members of the MFP never attended.  These intermediate states were much more frequent on the SBM versus the Erdos-Renyi model. 
+\begin{figure}[h!]
+  \includegraphics[width=0.32\textwidth]{gnp_attendance.png}
+  \includegraphics[width=0.32\textwidth]{cm_attendance.png}
+  \includegraphics[width=0.32\textwidth]{sbm_attendance.png}
+  \caption{Weekly attendance pattern on fixed random networks with a random choice of 30\% of nodes attending at $t=0$.  The Chung-Lu model with heterogeneous degree distribution produces close to uniform attendance, while the Erdos-Renyi and stochastic block model, which have more homogeneous degree distributions, have a much broader range of attendance across trials.  All three networks have mean degree between 10 and 11 with $\ell = 4$.}
+\end{figure}
+
+Figure 1 shows weekly attendance numbers on these random graphs over repeated trials with varying initial conditions.  Attendance converges to a consistent count in most but not all trials.  However, even on the same network with the same number of agents attending at $t=0$, weekly attendance varies between trials.  In both the Erdos-Renyi and SBM simulations, some initial conditions (wiith 30\% of agents attending) led to no agents attending at steady state, while others led to attainment of the maximal fixed point.  In addition, there were intermediate states in which a fraction of the MFP attended while other members of the MFP never attended.  These intermediate states were much more frequent on the SBM versus the Erdos-Renyi model. 
 
 In contrast, the Chung-Lu model leads to much more stable results.  However, results are still not identical between trials.  For example, on a network of 300 agents, 141 attended in the steady state for 94\% of trials, while 142 attended the other 6\% of the time.  The MFP contained 153 nodes, and no trial attained the MFP.
 
-Figure BLAH summarizes  attendance
 
-\includegraphics[scale=0.7]{gnp_attendance.png}
-\includegraphics[scale=0.7]{cm_attendance.png}
-\includegraphics[scale=0.7]{sbm_attendance.png}
 
 In many simulations, the exact same group of agents attended every week, resulting in a true fixed point as described in Section 3.  However, all three experiments had some trials in which the composition of agents attending varied from week to week.  After discarding the first 50 timesteps of the simulation, some agents attended every timestep, some agents never attended, and, in many trials, some agents attended exactly half of the timesteps.  Further investigation revealed that agents attending alternate weeks were coupled to each other.  
 
 In the simplest scenario, a pair of agents ($A_1$ and $A_2$) are neighbors and each have $\ell - 1$ neighbors that always attend.  If agent $A_1$ attends at time $t$, while agent $A_2$ does not, then at time $t+1$, agent $A_2$ will attend, as it had $\ell$ neighbors attending at time $t$, while agent $A_1$ will not attend, as it had just $\ell - 1$ neighbors in attendance at time $t$.  Thus the two agents will toggle back and forth indefinitely, essentially caught in a game of telephone tag in which they miss running into each other at every timestep.  In some cases, more complex interactions occur.  While more agents may be involved, the cycles always have period 2.
 
-\begin{center}
+\begin{figure}[h!]
 \includegraphics[scale=0.7]{always_sometimes_never.png}
-\end{center}
+\caption{Fraction of agents observed attending always, sometimes, or never in at least one trial.}
+\end{figure}
 
-Figure GORP shows the number distinct agents attending always, sometimes, or never in at least one trial for each of the three random graph models.  The figure shows the contrast between the Chung-Lu model with a heavy-tailed degree distribution, which has around half of the nodes in the Always and Never camp, and very few in Sometimes, compared with the Erdos-Renyi and stochastic block models, which have a much more variabiliity.  Almost all agents are occasionally in both the Always and Never groups depending on the trial, and many more agents attend sometimes.  These results suggest that more homogeneous degree distributions increase the probability of agents engaging in telephone tag behaviors, while contributing to more volatile results.  In contrast, the heavier-tailed degree distribution appears to have stabilizing influence on the outcome.
+Figure 2 shows the number distinct agents attending always, sometimes, or never in at least one trial for each of the three random graph models.  The figure shows the contrast between the Chung-Lu model with a heavy-tailed degree distribution, which has around half of the nodes in the Always and Never camp, and very few in Sometimes, compared with the Erdos-Renyi and stochastic block models, which have a much more variabiliity.  Almost all agents are occasionally in both the Always and Never groups depending on the trial, and many more agents attend sometimes.  These results suggest that more homogeneous degree distributions increase the probability of agents engaging in telephone tag behaviors, while contributing to more volatile results.  In contrast, the heavier-tailed degree distribution appears to have stabilizing influence on the outcome.
 
 \section{Analysis of Stability on Highly Structured Networks}
 
+\begin{figure}[h!]
+\includegraphics[width=0.5\textwidth]{one_minus.png}
+\includegraphics[width=0.5\textwidth]{alt_minus.png}
+\includegraphics[width=0.5\textwidth]{alt_plus.png}
+\includegraphics[width=0.5\textwidth]{zero_plus.png}
+\caption{Stability of fixed points on Von Neumann neighborhood network structure.  Just one node fails to attend as expected (top right and left), the whole system will shift to a new equilibrium.  When an agent attends unexpectedly (bottom right and left) the system immediately returns to equilibrium.}
+\end{figure}
+
 To understand the relationship between telephone tag and degree distribution, we consider a much more structured network.  Consider a network with nodes are arranged in a grid of shape $N$ by $N$ for some even integer $N$.  Each node is connected to the other nodes in its Von Neumann neighborhood, defined as the cells to the left, right, above or below where they exist.  Cells on the edges of the grid are have edges wrapping around to connect to the other side, so every node has exactly four neighbors.  If the simulation is run on this network, with $\ell = 3$, meaning a minimum of 4 neighbors are required, both universal attendance and universal nonattendance will be fixed points.  Universal telephone tag, in which every agend attends in alternate weeks, offset from all four neighbors, will also sustain itself indefinitely barring any perturbations.
 
-The system can sustain either universal attendance or universal telephone tag, but has no redundant edges above the minimum required.  If a single node in the universal attendance scenario fails to attend at one timestep, as shown in figure BLEEP, its neighbors will not attend at the next one, and a telephone tag scenario will emerge, beginning at the epicenter of the disruption and spreading across the entire network until there is universal telephone tag.  In the universal telephone tag scenario, as soon as one node fails to attend, non-attendance will spread and engulf the entire network, as show in figure BWOOP.
+The system can sustain either universal attendance or universal telephone tag, but has no redundant edges above the minimum required.  If a single agent in the universal attendance scenario fails to attend at one timestep, as shown in figure 3, its neighbors will not attend at the next one, and a telephone tag scenario will emerge, beginning at the epicenter of the disruption and spreading across the entire network until there is universal telephone tag.  In the universal telephone tag scenario, as soon as one node fails to attend, non-attendance will spread and engulf the entire network.
 
 However, if an agent attends an extra time in either the universal telephone tag or universal nonattendance scenarios, the effect cannot spread and the system returns to equilibrium as shown in figures meh and morp.
 
@@ -117,6 +136,8 @@ In addition to exploring a classic game theory problem with a new twist, this wo
 
 A natural extension of this work would be to allow agents to evolve their strategies toward improving their utiility.  In this scenario, an agents' behavior would depend not only on the topology of the neighborhood but on the distribution of strategies within it.  It could also be interesting to examine the results of these processes on empirical social network datasets, which tend to be much less locally treelike than the random graph models examined.    
 
+\bibliographystyle{plain} % We choose the "plain" reference style
+\bibliography{refs} % Entries are in the refs.bib file
 \section*{Code}
 
 \end{document}

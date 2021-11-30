@@ -138,9 +138,9 @@ def plot_freq(cnts, title, fn):
     plt.figure()
     mfp = cnts.maximal_fixed_point.sum()
     plt.hist((cnts.sum(axis=0)[:50]/(950*mfp)),bins=20,range=(0,1))
-    plt.xlabel("Proportion of MFP attending")
-    plt.ylabel("Frequency")
-    plt.title(title)
+    plt.xlabel("Proportion of MFP attending",fontsize=14)
+    plt.ylabel("Frequency",fontsize=14)
+    plt.title(title,fontsize=16)
     plt.savefig(fn)
 
 def mfp_freq(cnts):
