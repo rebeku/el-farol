@@ -167,20 +167,24 @@ if __name__ == "__main__":
     M = 600
     minfriends = 4
     minbad = 4
-    batch_size = 50
 
-    gammas = np.arange(1.1, 4.1, 0.05)
     k_std = []
     cnts_std = []
     n_trials =  5
     batch_size = 30
+    
+    gammas = np.arange(1.1, 4.1, 0.05)
+    gammas = np.hstack([gammas] * n_trials)
+    gammas.sort()
 
     k_0 = 10
-    """
+    
     for gamma in gammas:
         k = truncated_power_law(gamma, k_0, n, rng, size=size).astype(int)
         k.sort()
         
+        # find k so that the mean degree is between
+        # 10 and 11
         for _ in range(10):
             if k.mean() < 10:
                 k_0 = k_0 + 1
@@ -212,7 +216,6 @@ if __name__ == "__main__":
     plt.ylabel("Std of limiting attendance")
     plt.title("Chung-Lu Model: Impact of degree distribution")
     plt.savefig("images/chung_lu_std.png")
-    """
 
     print("Now simulating with noise")
     gamma = 2.3
