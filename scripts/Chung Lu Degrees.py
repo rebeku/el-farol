@@ -139,21 +139,23 @@ def simulate_with_noise(A, title, fname):
 
     for eps in epsilons:
         cnts = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
-        weekly = (cnts.sum(axis=0)[:batch_size]/(950))
+        mfp = cnts.maximal_fixed_point.sum()
+
+        weekly = (cnts.sum(axis=0)[:batch_size]/(950*mfp))
         cnts_std.append(weekly.std())
         cnts_mean.append(weekly.mean())
             
     plt.figure()
     plt.scatter(epsilons, cnts_mean)
     plt.xlabel("$\epsilon$")
-    plt.ylabel("$\sum_i y_i$")
+    plt.ylabel("Proportion of MFP Attending")
     plt.title(title.format("Mean"))
     plt.savefig(fname.format("mean"))
     
     plt.figure()
     plt.scatter(epsilons, cnts_std)
     plt.xlabel("$\epsilon$")
-    plt.ylabel("$\sum_i y_i$")
+    plt.ylabel("Proportion of MFP Attending")
     plt.title(title.format("STD"))
     plt.savefig(fname.format("std"))
 
@@ -173,11 +175,13 @@ if __name__ == "__main__":
     n_trials =  5
     batch_size = 30
     
-    gammas = np.arange(1.1, 4.1, 0.05)
+    gammas = np.arange(1.3, 4.1, 0.05)
     gammas = np.hstack([gammas] * n_trials)
     gammas.sort()
 
     k_0 = 10
+
+    """
     
     for gamma in gammas:
         k = truncated_power_law(gamma, k_0, n, rng, size=size).astype(int)
@@ -197,6 +201,7 @@ if __name__ == "__main__":
                 break
                     
         A = generate_chung_lu(k, rng)
+        print(f"K_0:{k_0}")
         print(f"Mean degree: {A.sum(axis=0).mean()}")
         k_std.append(A.sum(axis=0).std())
         
@@ -216,6 +221,40 @@ if __name__ == "__main__":
     plt.ylabel("Std of limiting attendance")
     plt.title("Chung-Lu Model: Impact of degree distribution")
     plt.savefig("images/chung_lu_std.png")
+    """
+
+    print("Simulating attendance vs. degree with noise")
+    eps = 0.2
+    N = size
+
+    probs = np.arange(0.02, 0.031, 0.0005)
+    probs = np.hstack([probs] * n_trials)
+    probs.sort()
+
+    attendance = []
+    mean_deg = []
+
+    for p in probs:
+        G = nx.gnp_random_graph(N, p, seed=rng.choice(1000))
+        A = nx.convert_matrix.to_numpy_array(G)
+        mean_deg.append(A.sum(axis=0).mean())
+        cnts = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
+        
+        mfp = cnts.maximal_fixed_point.sum()
+
+        weekly = (cnts.sum(axis=0)[:batch_size]/(950 * mfp))
+        attendance.append(weekly.mean())
+
+    attendance = np.array(attendance)
+    mean_deg = np.array(mean_deg)
+
+    mask = np.where(attendance < 2)[0]
+
+    plt.scatter(mean_deg[mask], attendance[mask])
+    plt.xlabel("Mean Degree")
+    plt.ylabel("Proportion of MFP Attending")
+    plt.title("Attendance on a Noisy Erdos-Renyi Network")
+    plt.savefig("images/mean_degree_v_noise.png")
 
     print("Now simulating with noise")
     gamma = 2.3
@@ -234,7 +273,6 @@ if __name__ == "__main__":
     N = len(A)
     p = k_bar / N
 
-    # G = nx.gnp_random_graph(N, 0.03268, seed=8888777)
     G = nx.gnp_random_graph(N, p, seed=8888777)
     A = nx.convert_matrix.to_numpy_array(G)
     print(f"Mean degree: {A.sum(axis=0).mean()}")

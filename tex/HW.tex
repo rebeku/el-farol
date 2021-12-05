@@ -6,6 +6,8 @@
 \usepackage{hyperref}
 \usepackage[latin1]{inputenc}
 \usepackage{listings}
+\usepackage{algorithm2e}
+\SetKwComment{Comment}{/* }{ */}
 
 \DeclareMathOperator{\Tr}{Tr}
 
@@ -34,9 +36,17 @@ Scholars have motivated the importance of this problem with applications such as
 
 There are variants of the El Farol problem that use coordination between agents to allow agents a broader choice of optimal strategies, although in such cases group coordination leads to lower overall utility as groups sharing the same strategy drive overcrowding. \cite{collins:2017} \cite{wilensky:2015}.  In addition, a variant of the problem has agents in a social network where agents' choices to go to the bar depend on their neighbors' history.   When these simulations are run on very regular network structures, a range of diverse equilibria can occur \cite{chen:2012}.  However, the agents have no innate preference to attend with or without their neighbors.
 
+To model agents with a preference to attend the bar together, we construct a model in which each agent chooses whether to attend at time $t = 1$ based on their neighbor's behaviors at time $t$.  The strategy that can be varied then is the threshold value for attendance.  Without adaptive learning, this model resembles the threshold model for binary opions, which has been rediscovered and published in different contexts by economist Thomas Schelling \cite{schelling:1978} and sociologist Mark Granovetter \cite{granovetter:1978} \cite{grabish:2020}.
+
+
+
+
+
+
+
 When agents prefer to attend with their neighbors, the system resembles a network cascade model STUFF STUFF.  While this paper does something slightly different, it resembles something by Elie Adam et al \cite{adam:2012} and similarly finds a broad range of fixed points and limit cycles.
 
-\section{Social Decision Function}
+\section{Model Specification}
 To test the hypothesis that local differences in the structure of social networks can encode the diversity of strategies required to regulate attendance, we construct a simple scenario in which each agent chooses to attend the bar if at least $\ell$ of the agent's neighbors attended the previous week.  We define the attendance vector $\vec{y}(t)$ such that
 \begin{equation}
   y_i(t) = \begin{cases}
@@ -60,6 +70,8 @@ where
 
 A traditional implementation of the El Farol bar problem would require some mechanism for modulating attendance patterns depending on the congestion level at the bar.  However, this paper will focus on the regulatory effect of the network structure itself.  As we shall see, in many cases the interaction of network structure with an appropriate choice of $\ell$ will maintain attendance below the traditional 60\% threshold. 
 
+\section{Fixed Points}
+
 Fixed points of this system occur where
 
 \begin{equation}
@@ -77,8 +89,26 @@ Unsurpisingly, the trivial fixed point of $\vec{y}_{\infty} = \vec{0}$ is a solu
 
 In general, we cannot expect $S$ to be unique.  As a simple example, suppose the network contains two mutually exclusive $\ell$-cliques, each of which is connected to the rest of the network by less than $\ell$ edges.  Then the network must have at least 3 nontrivial fixed points, consisting of the vertices in one or both cliques.
 
-However, a finite network must have a unique maximal fixed point (MFP), in which every agent that could possibly be a member of $S$ is.  
-TODO: Present MFP algo and show that sol'n is unique (or fuck off). 
+Algorithm 1, finds a fixed point of an arbitrary graph $G=(V,E)$.  We show that it will return the maximally large fixed point (MFP) possible, and that the MFP is unique for any $G$.
+
+\begin{algorithm}
+  \caption{Find MFP}\label{alg:two}
+  \KwData{$G = (V, E)$, $\ell$}
+  $G'(V', E') \gets G(V, E)$;
+  $N \gets 0$;
+  \While{$V'.size \neq N$}{
+    $N \gets $ V'.size\;
+    Delete all vertices with degree $\leq \ell$ \\
+    Remove all dangling edges
+  }
+  \Return{V'}
+  \end{algorithm}
+
+  The termination condition of the while loop guarantees that every element of $V'$ has at least $\ell + 1$ neighbors in $V'$.  Therefore, $V'$ must be a fixed point of $G$ with respect to $\ell$.  
+  
+  To show that $V'$ is the unique MFP, we introduce the following invariant that must be true at every iteration of the while loop: any $v \in V$ such that $v \notin V'$ cannot be in a fixed point of $G$ with respect to $\ell$.
+
+  On initialization, all elements of $V$ are in $V'$ so the invariant is trivially true.  During execution, the loop invariant guarantees that all possible elements of a fixed point are in $V'$, so any elements that are deleted cannot have $\ell + 1$ neighbors in the fixed point.  Therefore they cannot be in the fixed point themselves.  On exit, no additional nodes are deleted from $V'$.  So any node $v \notin V'$ cannot be a part of a fixed point and $V'$ contains the maximum possible set of nodes whose attendance could be a fixed point with respect to $\ell$. 
 
 \section{Deterministic Simulations}
 We can use numerical simulations to gain a stronger understanding of the steady state behavior of the system (if applicable).  We use three different well-understood random graph models: the Erdos-Renyi random graph, in which all possible edges exist with equal probability, the Chung-Lu model, which weights edge probabilitiies to obtain a target degree distribution, and the stochastic block model (SBM), in which the probabiliity of an edge is depends on its membership in a particular block.  Comparing the results on the Erdos-Renyi network vs. the Chung-Lu model, generated with a power law degree distribution, allows us to evaluate the impact of a heterogeneous degree distribution on the steady state of the system, while the SBM allows us to explore the impact of community structure.  The simulations were designed so that that the number of nodes and edges would be similar between the three models.  See Appendix for additional implentation details.
@@ -110,7 +140,7 @@ Further investigation revealed that agents attending alternate weeks were couple
 
 Figure 3 shows the number of distinct agents attending always, sometimes, or never in at least one trial for each of the three random graph models.  The figure shows the contrast between the Chung-Lu model with a heavy-tailed degree distribution, which has around half of the nodes in the Always and Never camp, and very few in Sometimes, compared with the Erdos-Renyi and stochastic block models, which have a much more variabiliity.  Almost all agents are occasionally in both the Always and Never groups depending on the trial, and many more agents attend sometimes.  These results suggest that more homogeneous degree distributions increase the probability of agents engaging in telephone tag behaviors, as well as variability in steady state attendance.
 
-\section{Analysis of Stability on Highly Structured Networks}
+\section{Analysis of Stability on a Lattice}
 
 \begin{figure}[h!]
 \includegraphics[width=0.5\textwidth]{one_minus.png}
@@ -136,25 +166,39 @@ However, if an agent attends an extra time in either the universal telephone tag
 
 On these networks and other $\ell + 1$-regular graphs, universal nonattendance is the only stable fixed point.  The fact that attendance can stabilize to a nonzero level in simulations on random networks is only possible because some nodes have degree greater than $\ell + 1$.
 
-\section{Noise?}
+\section{Random Noise}
 \begin{figure}
   \includegraphics[width=0.5\textwidth]{noisy_erdos_renyi_mean.png}
-  \includegraphics[width=0.5\textwidth]{noisy_chung_lu_mean.png}
-  \includegraphics[width=0.5\textwidth]{noisy_sbm_mean.png}
-  \caption{Stuff}
+  \includegraphics[width=0.5\textwidth]{mean_degree_v_noise.png}
+  \caption{Behavior with noise on an Erdos-Renyi random graph, $\ell + 1 = 4$, varying $\epsilon$, $\langle k \rangle = 9.69$ (Top), and varying $\langle k \rangle$, $\epsilon = 0.15$ (Bottom)}
 \end{figure}
 
-Adding noise allows encourages the telephone tag scenario to synchronize but also allows stable fixed points to erode?  Locally treelike networks with heterogeneous degree distributions may settle into something close to the maximal fixed point.  Punctuated equilibria on SBM.
+In deterministic simulations on both regular and random networks, telephone tag phenomena are common and the MFP is often unreachable.  When each node has degree exactly $\ell + 1$, we have seen that the presence of randomness drives attendance down.  However, with sufficient density of edges, noise could allow otherwise unreachable nodes in the MFP to begin attending.
 
-\section{Discussion and Future Work}
+To test the impact of noise on random networks, we introduce a new parameter, $\epsilon$ to govern the noisiness of the system.  We define
 
-The El Farol Bar problem has traditionally considered a population of agents with diverse strategies attempting to share a limited resource.  Traditional strategies often result in some agents attending always, some attending never, and some attending periodically, with a total attendance close to the tolerance threshold.
+\begin{equation}
+  F'(\vec{x})_i = \begin{cases}
+    1 - F(x_i) &\text{with} \\
+    & \text{probabiliity} \epsilon \\
+    F(x_i) &\text{otherwise}
+  \end{cases}
+\end{equation}
 
-In this paper, we find that a population of agents all following the same network-based strategy can behave in a similar way, with a subset of agents always attending, a subset never attending, and a subset attending periodically.  Furthermore, we have seen how network topology and the inclusion of noise influence the outcomes.
+and set
+\begin{equation}
+  \vec{y}(t + 1) = F'(\mathbf{A}\vec{y}(t))
+\end{equation}
 
-In addition to exploring a classic game theory problem with a new twist, this work has interesting parallels with opinion modeling.  Spread of trends, social media hashtags.  Hipster effect.
+We find an interesting relationship between $\langle k \rangle$ and $\epsilon$.  When $\langle k \rangle$ is sufficiently large, figure 7 (top) shows that increasing $\epsilon$ increases attendance until the network is reliably close to the MFP.  However, figure 7 (bottom) shows that this effect only occurs after a phase transition occuring around $\langle k \rangle = 2 (\ell + 1)$.
 
-A natural extension of this work would be to allow agents to evolve their strategies toward improving their utiility.  In this scenario, an agents' behavior would depend not only on the topology of the neighborhood but on the distribution of strategies within it.  It could also be interesting to examine the results of these processes on empirical social network datasets, which tend to be much less locally treelike than the random graph models examined.    
+\section{Discussion}
+
+The El Farol Bar problem has traditionally considered a population of agents with diverse strategies attempting to share a limited resource.  Traditional strategies often result in some agents attending always, some attending never, and some attending periodically, with a total attendance close to the tolerance threshold\cite{arthur:1994} \cite{stLuce:2020}.
+
+In this paper, we find that a population of agents all following the same network-based strategy can behave similarly to the system of agents with heterogeneous strategies, with a subset of agents always attending, a subset never attending, and a subset attending periodically.  Furthermore, we have see how the interaction of the threshold, network structure, and random noise can effect the strategy distribution, with higher mean degrees, and, in some regimes increased noise leading to higher rates of attendance, and heterogeneous degree distributions leading to decreased sensitivity to initial conditions and lower rates of telephone tag behaviors.
+
+A network can encode a distribution of strategies across multiple agents, but a natural extension of this work would be to reintroduce the evolutionary or inductive learning component that characterizes previous work on the El Farol bar problem.  One way to do this would be to allow agents to vary their $\ell$ value based on past performance.  Another possibility would be to allow agents to modify the network structure, such as forming new edges if they do not have sufficient friends in attendance, or removing edges if they are encountering congestion.  It could also be interesting to examine the results of these processes on empirical social network datasets, which tend to be much less locally treelike than the random graph models examined.    
 
 \bibliographystyle{plain} % We choose the "plain" reference style
 \bibliography{refs} % Entries are in the refs.bib file
