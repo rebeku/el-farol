@@ -36,15 +36,13 @@ Scholars have motivated the importance of this problem with applications such as
 
 There are variants of the El Farol problem that use coordination between agents to allow agents a broader choice of optimal strategies, although in such cases group coordination leads to lower overall utility as groups sharing the same strategy drive overcrowding. \cite{collins:2017} \cite{wilensky:2015}.  In addition, a variant of the problem has agents in a social network where agents' choices to go to the bar depend on their neighbors' history.   When these simulations are run on very regular network structures, a range of diverse equilibria can occur \cite{chen:2012}.  However, the agents have no innate preference to attend with or without their neighbors.
 
-To model agents with a preference to attend the bar together, we construct a model in which each agent chooses whether to attend at time $t = 1$ based on their neighbor's behaviors at time $t$.  The strategy that can be varied then is the threshold value for attendance.  Without adaptive learning, this model resembles the threshold model for binary opions, which has been rediscovered and published in different contexts by economist Thomas Schelling \cite{schelling:1978} and sociologist Mark Granovetter \cite{granovetter:1978} \cite{grabish:2020}.
+To model agents with a preference to attend the bar together, we construct a model in which each agent chooses whether to attend at time $t = 1$ based on their neighbor's behaviors at time $t$.  The strategy that can be varied then is the threshold value for attendance.  Without adaptive learning, this model resembles the threshold model for binary opions, which has been rediscovered and published in different contexts by economist Thomas Schelling \cite{schelling:1978} and sociologist Mark Granovetter \cite{granovetter:1978} \cite{grabish:2020}.  
 
+If agents' thresholds are sufficiently low relative to their degrees on a fixed network, then the action, in this case attending the bar, would spread over the entire network, leading to congestion.  However, if the thresholds are too high, no agent will ever attend.  Between these two extremes, threshold models may have many stable or semi-stable fixed points \cite{adam:2012} and hysteresis \cite{Wiedermann_2020}.  Threshold models may also have limit cycles.  On an undirected network, these can be shown to always have period 2 \cite{grabish:2020} \cite{goles:1980}.
 
+In the context of the El Farol bar problem, this paper will explore the impact of network structure on the dynamics of this intermediate regime.  When will network structure lead to suitably varied limiting behavior such that the bar can maintain attendance by a group of regulars without becoming overcrowded?  
 
-
-
-
-
-When agents prefer to attend with their neighbors, the system resembles a network cascade model STUFF STUFF.  While this paper does something slightly different, it resembles something by Elie Adam et al \cite{adam:2012} and similarly finds a broad range of fixed points and limit cycles.
+We consider the impact of mean degree, heterogeneity of degree, and community structure on the number of agents attending, the sensitivity of the system to initial conditions, and the frequency of period 2 limit cycles.  We also consider the impact of random noise and examine the stability of fixed points on a particularly regular network.
 
 \section{Model Specification}
 To test the hypothesis that local differences in the structure of social networks can encode the diversity of strategies required to regulate attendance, we construct a simple scenario in which each agent chooses to attend the bar if at least $\ell$ of the agent's neighbors attended the previous week.  We define the attendance vector $\vec{y}(t)$ such that
