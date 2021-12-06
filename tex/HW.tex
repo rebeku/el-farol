@@ -16,15 +16,13 @@
   breaklines=true,
 }
 
-\twocolumn
-
 \title{El Farol Bar Problem on a Social Network}
 \author{Rebecca Cohen}
 
 \begin{document}
 \maketitle
 \section{Abstract}
-Does network structure determine which agents will attend the bar in a modified El Farol Bar problem.  In most cases, the network does not appear to converge to a single stable fixed point, but rather oscillates around an attractor in which some agents always attend and others attend in alternating weeks.  
+The El Farol Bar problem is a classic game theory model in which independent agents learn to use a heterogeous distribution of strategies to share a limited resource while avoiding congestion.  This paper analyzes what happens if instead of choosing whether to attend the bar or not independently, agents attempt to attend the bar with their friends on a social network.  We find that depending on the combination of threshold and network structure, agents may develop a heterogeneous distribution of behaviors that can utilize the resource without overcrowding it.  We derive an algorithm to identify the largest possible fixed point on a given network, but show that this fixed point is often unreachable.  Using numerical algorithms, we test the impact of edge density, heterogeneity of degree, community structure, and random noise, finding that noise, as well as edge density can contribute to higher attendance rates, heterogeneous degree distributions lead to less sensitivity to initial conditions, and community structure leads to an increased variability of outcome and increased frequency of period 2 limit cycles.  Wholistically, these results show that agents following the same strategy in different network contexts can behave similarly to those following different strategies independently.
 
 \section{Introduction}
 
@@ -119,59 +117,45 @@ In contrast, as degree increases on the Chung Lu model, attendance grows much mo
 The remainder of this paper will focus on the intermediate region in which some but not all agents attend at steady state.  While we cannot generate random networks with identical degree, we use a target range of $\langle k \rangle \in [10, 11]$ to generate roughly comparable networks in this region.
 
 \begin{figure}
-  \includegraphics[width=0.45\textwidth]{erdos_renyi_degree.png}
-  \includegraphics[width=0.45\textwidth]{sbm_degree.png}
-  \includegraphics[width=0.45\textwidth]{chung_lu_degree.png}
+  \includegraphics[width=0.32\textwidth]{erdos_renyi_degree.png}
+  \includegraphics[width=0.32\textwidth]{sbm_degree.png}
+  \includegraphics[width=0.32\textwidth]{chung_lu_degree.png}
   \caption{Weekly attendance patterns on random networks with varying mean degree.  $\ell = 4$}
 \end{figure}
 
 \subsection{Variability of Outcomes}
 \begin{figure}[h!]
-  \includegraphics[width=0.45\textwidth]{gnp_attendance.png}
-  \includegraphics[width=0.45\textwidth]{sbm_attendance.png}
-  \includegraphics[width=0.45\textwidth]{cm_attendance.png}
+  \includegraphics[width=0.32\textwidth]{gnp_attendance.png}
+  \includegraphics[width=0.32\textwidth]{sbm_attendance.png}
+  \includegraphics[width=0.32\textwidth]{cm_attendance.png}
   \caption{Weekly attendance pattern on fixed random networks across multiple trials}
 \end{figure}
 
 Figure 2 shows weekly attendance numbers on these random graphs over repeated trials with varying initial conditions.  Attendance converges to a consistent count in most but not all trials.  However, even on the same network with the same number of agents attending at $t=0$, weekly attendance varies between trials.  In both the Erdos-Renyi and SBM simulations, some initial conditions (wiith 30\% of agents attending) led to no agents attending at steady state, while others led to attainment of the maximal fixed point.  In addition, there were intermediate states in which a fraction of the MFP attended while other members of the MFP never attended.  These intermediate states were much more frequent on the SBM versus the Erdos-Renyi model. 
 
-In contrast, the Chung-Lu model leads to much more stable results.  However, results are still not identical between trials, and no trial attained the MFP.  To further test the relationship between heterogeneous degree distribution and variations in steady state attendance, figure 2 plots the standard deviation of the degree distribution against the standard deviation of steady state attendance between multiple trials on fixed networks.  Mean degree was held steady between trials.  This experiment validates the observation that more varied degree sequences lead to more stable attendance patterns, although the plot also highlights the role of randomness in determining whether a network will have multiple reachable steady states.
+In contrast, the Chung-Lu model leads to much more stable results.  However, results are still not identical between trials, and no trial attained the MFP.  To further test the relationship between heterogeneous degree distribution and variations in steady state attendance, figure 3 (left) plots the standard deviation of the degree distribution against the standard deviation of steady state attendance between multiple trials on fixed networks.  Mean degree was held steady between trials.  This experiment validates the observation that more varied degree sequences lead to more stable attendance patterns, although the plot also highlights the role of randomness in determining whether a network will have multiple reachable steady states.
 
 \begin{figure}
   \includegraphics[width=0.45\textwidth]{chung_lu_std.png}
-  \caption{Standard deviation of degree distribution vs. steady state attendance patterns on the Chung-Lu model}
+  \includegraphics[width=0.45\textwidth]{always_sometimes_never.png}
+  \caption{Standard deviation of degree distribution vs. steady state attendance patterns on the Chung-Lu model (left).  Fraction of agents observed attending always, sometimes, or never in at least one trial (right).}
 \end{figure}
 
-In many simulations, the exact same group of agents attended every week, resulting in a true fixed point as described in Section 3.  However, all three experiments had some trials in which the composition of agents attending varied from week to week.  After discarding the first 50 timesteps of the simulation, some agents attended every timestep, some agents never attended, and, in many trials, some agents attended exactly half of the timesteps.
+In many simulations, the exact same group of agents attended every week, resulting in a fixed point as described in Section 3.  However, all three models had some trials that had limit cycles of period 2.   These limit cycles are the result of coupled agents that reach the threshold dependent on each other's behavior.  If one agent but not the other attends as part of the initial conditions, the two agents will toggle back and forth indefinitely, caught in a game of telephone tag in which they miss running into each other at every timestep.  In some cases, more complex interactions occur, involving more than two agents.
 
-Further investigation revealed that agents attending alternate weeks were coupled to each other.  If a pair of agents each have exactly $\ell$ neighbors attending, excluding each other, each agent will attend at time $t+1$ if and only if the other attended at time $t$.  If one agent but not the other attends as part of the initial conditions, the two agents will toggle back and forth indefinitely, caught in a game of telephone tag in which they miss running into each other at every timestep.  In some cases, more complex interactions occur, involving more than two agents.
-
-\begin{figure}[h!]
-\includegraphics[width=0.45\textwidth]{always_sometimes_never.png}
-\caption{Fraction of agents observed attending always, sometimes, or never in at least one trial.}
-\end{figure}
-
-Figure 3 shows the number of distinct agents attending always, sometimes, or never in at least one trial for each of the three random graph models.  The figure shows the contrast between the Chung-Lu model with a heavy-tailed degree distribution, which has around half of the nodes in the Always and Never camp, and very few in Sometimes, compared with the Erdos-Renyi and stochastic block models, which have a much more variabiliity.  Almost all agents are occasionally in both the Always and Never groups depending on the trial, and many more agents attend sometimes.  These results suggest that more homogeneous degree distributions increase the probability of agents engaging in telephone tag behaviors, as well as variability in steady state attendance.
+Figure 3 (right) shows the number of distinct agents attending always, sometimes, or never in at least one trial for each of the three random graph models.  The figure shows the contrast between the Chung-Lu model with a heavy-tailed degree distribution, which has around half of the nodes in the Always and Never camp, and very few in Sometimes, compared with the Erdos-Renyi and stochastic block models, which have a much more variabiliity.  Almost all agents are occasionally in both the Always and Never groups depending on the trial, and many more agents attend sometimes.  These results suggest that more homogeneous degree distributions increase the probability of agents engaging in telephone tag behaviors, as well as variability in steady state attendance.
 
 \subsection{Stability on a Lattice}
 
 \begin{figure}[h!]
 \includegraphics[width=0.5\textwidth]{one_minus.png}
-\caption{Unstability of universal attendance on the Von Neumann neighborhood network.}
-\end{figure}
-\begin{figure}[h!]
 \includegraphics[width=0.5\textwidth]{alt_minus.png}
-\caption{Unstability from below of universal telephone on the Von Neumann neighborhood network.}
-\end{figure}
-
-\begin{figure}
 \includegraphics[width=0.5\textwidth]{alt_plus.png}
 \includegraphics[width=0.5\textwidth]{zero_plus.png}
-\caption{Stability from above of universal nonattendance and universal telephone tag}
+\caption{Unstability with respect to negative perturbations of universal attendance (top left) and universal telephone tag (top right) on the Von Neumann neighborhood network.  Stability with regard to positive perturbations of universal telephone tag (bottom right) and universal attendance (bottom left)}
 \end{figure}
 
-
-To understand the relationship between telephone tag and degree distribution, we consider a much more structured network.  Consider a network with nodes are arranged in a grid of shape $N$ by $N$ for some even integer $N$.  Each node is connected to the other nodes in its Von Neumann neighborhood, defined as the cells to the left, right, above or below where they exist.  Cells on the edges of the grid are have edges wrapping around to connect to the other side, so every node has exactly four neighbors.  If the simulation is run on this network, with $\ell = 4$, both universal attendance and universal nonattendance will be fixed points.  Universal telephone tag, in which every agend attends in alternate weeks, offset from all four neighbors, will also sustain itself indefinitely barring any perturbations.
+To understand the relationship between limit cycles and degree distribution, we consider a much more structured network.  Consider a network with nodes are arranged in a grid of shape $N$ by $N$ for some even integer $N$.  Each node is connected to the other nodes in its Von Neumann neighborhood, defined as the cells to the left, right, above or below where they exist.  Cells on the edges of the grid are have edges wrapping around to connect to the other side, so every node has exactly four neighbors.  If the simulation is run on this network, with $\ell = 4$, both universal attendance and universal nonattendance will be fixed points.  Universal telephone tag, in which every agend attends in alternate weeks, offset from all four neighbors, will also sustain itself indefinitely barring any perturbations.
 
 The system can sustain either universal attendance or universal telephone tag, but has no redundant edges above the minimum required.  If a single agent in the universal attendance scenario fails to attend at one timestep, as shown in figure 3, its neighbors will not attend at the next one, and a telephone tag scenario will emerge, beginning at the epicenter of the disruption and spreading across the entire network until there is universal telephone tag.  In the universal telephone tag scenario, as soon as one node fails to attend, non-attendance will spread and engulf the entire network.
 
@@ -199,13 +183,13 @@ and set
 \end{equation}
 
 \begin{figure}
-  \includegraphics[width=0.5\textwidth]{noisy_erdos_renyi.png}
-  \includegraphics[width=0.5\textwidth]{noisy_sbm.png}
-  \includegraphics[width=0.5\textwidth]{noisy_chung_lu.png}
+  \includegraphics[width=0.32\textwidth]{noisy_erdos_renyi.png}
+  \includegraphics[width=0.32\textwidth]{noisy_sbm.png}
+  \includegraphics[width=0.32\textwidth]{noisy_chung_lu.png}
   \caption{Impact of noise level $\epsilon$ on random graph models}
 \end{figure}
 
-Figure 7 shows the impact of $\epsilon$ on the same three random graph models from section 5.  On the Erdos-Renyi and SBM experiments, which have homogeneous degree distributions, increasing $\epsilon$ from 0 to around 0.14 increases weekly attendance and decreases the standard deviation between trials.  To make sense of this behavior, we note that nodes in the MFP may come in smaller pockets that are less densely connected to the rest of the network.  Adding noise makes it easier for agents within a pocket to begin attending.  If there is sufficient redudancy within the pocket, attendance can sustain itself even though agents may randomly nonattend.  
+Figure 5 shows the impact of $\epsilon$ on the same three random graph models from section 5.  On the Erdos-Renyi and SBM experiments, which have homogeneous degree distributions, increasing $\epsilon$ from 0 to around 0.14 increases weekly attendance and decreases the standard deviation between trials.  To make sense of this behavior, we note that nodes in the MFP may come in smaller pockets that are less densely connected to the rest of the network.  Adding noise makes it easier for agents within a pocket to begin attending.  If there is sufficient redudancy within the pocket, attendance can sustain itself even though agents may randomly nonattend.  
 
 As $\epsilon$ continues to grow, there is an abrupt transition after which the standard deviation is close to 0 and attendance begins decreasing.  More work is needed to come to a deeper understanding of why the transition is so abrupt, but at higher $\epsilon$ levels, it appears that all elements of the MFP are findable.  Those that have sufficient redundancy to withstand the random fluctuations end up attending, barring any that randomly fail to attend on each trial.
 
