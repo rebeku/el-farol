@@ -7,37 +7,27 @@ from chung_lu import generate_chung_lu, truncated_power_law
 
 
 def simulate_with_noise(A, title, fname):
-    n_trials = 5
-    epsilons = np.arange(0, 0.2, 0.01)
-    epsilons = np.hstack([epsilons] * n_trials)
-    epsilons.sort()
+    epsilons = np.arange(0, 0.25, 0.01)
+    weekly = []
 
-    cnts_mean = []
-    cnts_std = []
     batch_size = 20
 
     for eps in epsilons:
         cnts = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
         mfp = cnts.maximal_fixed_point.sum()
 
-        weekly = (cnts.sum(axis=0)[:batch_size]/(950*mfp))
-        cnts_std.append(weekly.std())
-        cnts_mean.append(weekly.mean())
-            
-    plt.figure()
-    plt.scatter(epsilons, cnts_mean)
-    plt.xlabel("$\epsilon$")
-    plt.ylabel("Proportion of MFP Attending")
-    plt.title(title.format("Mean"))
-    plt.savefig(fname.format("mean"))
-    
-    plt.figure()
-    plt.scatter(epsilons, cnts_std)
-    plt.xlabel("$\epsilon$")
-    plt.ylabel("Proportion of MFP Attending")
-    plt.title(title.format("STD"))
-    plt.savefig(fname.format("std"))
+        weekly.append((cnts.sum(axis=0)[:batch_size]/(950*mfp)))
 
+    w = np.vstack(weekly)
+    plt.figure()
+    plt.errorbar(epsilons, w.mean(axis=1), w.std(axis=1), fmt="P")
+    plt.xlabel("$\epsilon$")
+    plt.ylabel("Proportion of MFP Attending")
+    plt.title(title)
+    plt.tight_layout()
+    plt.savefig(fname)
+
+    
 if __name__ == "__main__":
     rng = np.random.default_rng(2357111)
 
@@ -49,39 +39,45 @@ if __name__ == "__main__":
     minfriends = 4
     minbad = 4
     n_trials = 5
-    batch_size = 30
+    batch_size = 3
 
     print("Simulating attendance vs. degree with noise")
     eps = 0.15
     N = size
 
-    probs = np.arange(0.02, 0.031, 0.0005)
+    probs = np.arange(0.02, 0.05, 0.001)
     probs = np.hstack([probs] * n_trials)
     probs.sort()
 
     attendance = []
     mean_deg = []
+    nonoise = []
 
     for p in probs:
         G = nx.gnp_random_graph(N, p, seed=rng.choice(1000))
         A = nx.convert_matrix.to_numpy_array(G)
-        mean_deg.append(A.sum(axis=0).mean())
-        cnts = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
+        mean_deg.extend([A.sum(axis=0).mean()] * batch_size)
         
+        cnts = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
         mfp = cnts.maximal_fixed_point.sum()
-
         weekly = (cnts.sum(axis=0)[:batch_size]/(950 * mfp))
-        attendance.append(weekly.mean())
+        attendance.extend(weekly.tolist())
+        
+        cnts = run_simulation_batch(A, n_iter, 0, M, minfriends, minbad, batch_size, rng)
+        mfp = cnts.maximal_fixed_point.sum()
+        weekly = (cnts.sum(axis=0)[:batch_size]/(950 * mfp))
+        nonoise.extend(weekly.tolist())
 
     attendance = np.array(attendance)
     mean_deg = np.array(mean_deg)
+    nonoise = np.array(nonoise)
 
-    mask = np.where(attendance < 2)[0]
-
-    plt.scatter(mean_deg[mask], attendance[mask])
+    plt.scatter(mean_deg, attendance)
+    plt.scatter(mean_deg, nonoise)
+    plt.legend(["$\epsilon=0.15$", "$\epsilon=0$"])
     plt.xlabel("Mean Degree")
     plt.ylabel("Proportion of MFP Attending")
-    plt.title("Attendance on a Noisy Erdos-Renyi Network")
+    plt.title("Noisy vs. Determininistic Erdos-Renyi")
     plt.savefig("images/mean_degree_v_noise.png")
 
     print("Now varying epsilon")
@@ -92,7 +88,7 @@ if __name__ == "__main__":
     A = generate_chung_lu(k, rng)
     print(f"Mean degree: {A.sum(axis=0).mean()}")
 
-    simulate_with_noise(A, "Chung-Lu Model: {} Weekly Attendance", "images/noisy_chung_lu_{}.png")
+    simulate_with_noise(A, "Noisy Chung-Lu Model", "images/noisy_chung_lu.png")
 
 
     # generate Erdos-Renyi random graph
@@ -105,7 +101,7 @@ if __name__ == "__main__":
     A = nx.convert_matrix.to_numpy_array(G)
     print(f"Mean degree: {A.sum(axis=0).mean()}")
     
-    simulate_with_noise(A, "Erods-Renyi: {} Weekly Attendance", "images/noisy_erdos_renyi_{}.png")
+    simulate_with_noise(A, "Noisy Erods-Renyi", "images/noisy_erdos_renyi.png")
     
     print("\nRunning simulation on stochastic block model.")
     sizes = [100, 100, 100]
@@ -114,4 +110,4 @@ if __name__ == "__main__":
     A = nx.convert_matrix.to_numpy_matrix(G)
     print(f"Mean degree: {A.sum(axis=0).mean()}")
 
-    simulate_with_noise(A, "SBM: {} Weekly Attendance", "images/noisy_sbm_{}.png")
+    simulate_with_noise(A, "Noisy SBM", "images/noisy_sbm.png")

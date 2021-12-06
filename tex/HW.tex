@@ -113,8 +113,8 @@ We can use numerical simulations to gain a stronger understanding of the steady 
 
 \begin{figure}[h!]
   \includegraphics[width=0.45\textwidth]{gnp_attendance.png}
-  \includegraphics[width=0.45\textwidth]{cm_attendance.png}
   \includegraphics[width=0.45\textwidth]{sbm_attendance.png}
+  \includegraphics[width=0.45\textwidth]{cm_attendance.png}
   \caption{Weekly attendance pattern on fixed random networks across multiple trials}
 \end{figure}
 
@@ -165,13 +165,12 @@ However, if an agent attends an extra time in either the universal telephone tag
 On these networks and other $\ell + 1$-regular graphs, universal nonattendance is the only stable fixed point.  The fact that attendance can stabilize to a nonzero level in simulations on random networks is only possible because some nodes have degree greater than $\ell + 1$.
 
 \section{Random Noise}
+
 \begin{figure}
-  \includegraphics[width=0.5\textwidth]{noisy_erdos_renyi_mean.png}
   \includegraphics[width=0.5\textwidth]{mean_degree_v_noise.png}
-  \caption{Behavior with noise on an Erdos-Renyi random graph, $\ell + 1 = 4$, varying $\epsilon$, $\langle k \rangle = 9.69$ (Top), and varying $\langle k \rangle$, $\epsilon = 0.15$ (Bottom)}
 \end{figure}
 
-In deterministic simulations on both regular and random networks, telephone tag phenomena are common and the MFP is often unreachable.  When each node has degree exactly $\ell + 1$, we have seen that the presence of randomness drives attendance down.  However, with sufficient density of edges, noise could allow otherwise unreachable nodes in the MFP to begin attending.
+When each node has degree exactly $\ell + 1$, we have seen that the presence of randomness drives attendance down.  However, with sufficient density of edges, noise could allow otherwise unreachable nodes in the MFP to begin attending.
 
 To test the impact of noise on random networks, we introduce a new parameter, $\epsilon$ to govern the noisiness of the system.  We define
 
@@ -188,7 +187,18 @@ and set
   \vec{y}(t + 1) = F'(\mathbf{A}\vec{y}(t))
 \end{equation}
 
-We find an interesting relationship between $\langle k \rangle$ and $\epsilon$.  When $\langle k \rangle$ is sufficiently large, figure 7 (top) shows that increasing $\epsilon$ increases attendance until the network is reliably close to the MFP.  However, figure 7 (bottom) shows that this effect only occurs after a phase transition occuring around $\langle k \rangle = 2 (\ell + 1)$.
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{noisy_erdos_renyi.png}
+  \includegraphics[width=0.5\textwidth]{noisy_sbm.png}
+  \includegraphics[width=0.5\textwidth]{noisy_chung_lu.png}
+  \caption{Impact of noise level $\epsilon$ on random graph models}
+\end{figure}
+
+Figure 7 shows the impact of $\epsilon$ on the same three random graph models from section 5.  On the Erdos-Renyi and SBM experiments, which have homogeneous degree distributions, increasing $\epsilon$ from 0 to around 0.14 increases weekly attendance and decreases the standard deviation between trials.  To make sense of this behavior, we note that nodes in the MFP may come in smaller pockets that are less densely connected to the rest of the network.  Adding noise makes it easier for agents within a pocket to begin attending.  If there is sufficient redudancy within the pocket, attendance can sustain itself even though agents may randomly nonattend.  
+
+As $\epsilon$ continues to grow, there is an abrupt transition after which the standard deviation is close to 0 and attendance begins decreasing.  More work is needed to come to a deeper understanding of why the transition is so abrupt, but at higher $\epsilon$ levels, it appears that all elements of the MFP are findable.  Those that have sufficient redundancy to withstand the random fluctuations end up attending, barring any that randomly fail to attend on each trial.
+
+On the Chung-Lu model with heterogeneous degree distribution, there is very little variation between trials.  We saw without any noise that this network already produced close to identical results across trials, so it is not surprising that we do not observe the variability we saw in the Erdos-Renyi model and SBM.  However, the attendance rate on this network decreases faster than could be explained solely by random non-attendance, indicating that nodes with less redundancy are failing to attend in the steady state. 
 
 \section{Discussion}
 

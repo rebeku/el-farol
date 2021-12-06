@@ -14,7 +14,12 @@ def run_simulation(X, A, n_iter, eps, M, minfriends, minbad, rng):
         else:
             X = (A.dot(X) > minbad)
 
+        # a few extras attend randomly
         X += rng.uniform(size=(len(A),1)) < eps
+        
+        # a few do not attend randomly
+        X = np.bitwise_and(X, rng.uniform(size=(len(A),1)) > eps)
+        
         Xs.append(X)
 
     return np.hstack(Xs)
