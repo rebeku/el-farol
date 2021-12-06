@@ -32,7 +32,7 @@ The El Farol Bar problem, named and popularized by Brian Arthur, is a stylized m
 
 In Arthur's original publication, each agent has access to a finite pool of fixed strategies, as well as weekly attendance history for the entire system.  At each timestep, the agent selects the strategy that would have led to the best performance over some recent time window.  In the original setup and many later variants, weekly attendance will never completely stabilize but will oscillate around the congestion threshold \cite{arthur:1994} \cite{chen:2012} \cite{zambrano:2004}.  While attendance is attracted to a certain range, the distribution of strategies amongst agents does not stabilize.  However, in simpler setups in which agents choose from just two or three strategies, the system will converge to a stable and predictable attractor depending on the initial strategy distribution \cite{stLuce:2020}.
 
-Scholars have motivated the importance of this problem with applications such as traffic and public transit congestion, internet traffic, and financial markets \cite{zambrano:2004} \cite{chen:2012}.  In these applications, modeling agents as behaving independently and attempting to optimize solely their own utility may be a reasonable model for empirical behaviors.  However, humans are social animals and in many situations, including the original story motivating the El Farol bar problem, agents may not only prefer to avoid crowding, but also prefer the company of friends.  Thus agents must balance two competing priorities, the need to coordinate with other members of a local neighborhood within a social network, and the need to avoid crowds.
+Scholars have motivated the importance of this problem with applications such as traffic and public transit congestion, internet traffic, and financial markets \cite{zambrano:2004} \cite{chen:2012}.  In these applications, modeling agents as behaving independently and attempting to optimize solely their own utility may be a reasonable model for empirical behaviors.  However, humans are social animals and in many situations, including the original story motivating the El Farol bar problem, agents may not only prefer to avoid crowding, but also prefer the company of friends.  Thus agents must balance two competing priorities, the need to coordinate with other members of a local neighborhood within a social network, and the need to avoid crowds.  In addition to attendance at bars, modeling this scenario could represent many other social behaviors in which individuals want to conform to their friends, but not the general population, such as trends in fashion and music.
 
 There are variants of the El Farol problem that use coordination between agents to allow agents a broader choice of optimal strategies, although in such cases group coordination leads to lower overall utility as groups sharing the same strategy drive overcrowding. \cite{collins:2017} \cite{wilensky:2015}.  In addition, a variant of the problem has agents in a social network where agents' choices to go to the bar depend on their neighbors' history.   When these simulations are run on very regular network structures, a range of diverse equilibria can occur \cite{chen:2012}.  However, the agents have no innate preference to attend with or without their neighbors.
 
@@ -108,9 +108,24 @@ Algorithm 1, finds a fixed point of an arbitrary graph $G=(V,E)$.  We show that 
 
   On initialization, all elements of $V$ are in $V'$ so the invariant is trivially true.  During execution, the loop invariant guarantees that all possible elements of a fixed point are in $V'$, so any elements that are deleted cannot have $\ell + 1$ neighbors in the fixed point.  Therefore they cannot be in the fixed point themselves.  On exit, no additional nodes are deleted from $V'$.  So any node $v \notin V'$ cannot be a part of a fixed point and $V'$ contains the maximum possible set of nodes whose attendance could be a fixed point with respect to $\ell$. 
 
-\section{Deterministic Simulations}
+\section{Numerical Simulations}
 We can use numerical simulations to gain a stronger understanding of the steady state behavior of the system (if applicable).  We use three different well-understood random graph models: the Erdos-Renyi random graph, in which all possible edges exist with equal probability, the Chung-Lu model, which weights edge probabilitiies to obtain a target degree distribution, and the stochastic block model (SBM), in which the probabiliity of an edge is depends on its membership in a particular block.  Comparing the results on the Erdos-Renyi network vs. the Chung-Lu model, generated with a power law degree distribution, allows us to evaluate the impact of a heterogeneous degree distribution on the steady state of the system, while the SBM allows us to explore the impact of community structure.  The simulations were designed so that that the number of nodes and edges would be similar between the three models.
 
+\subsection{Attendance Rates}
+Figure 1 shows the weekly attendance on each of the three random graph models.  Both the Erdos-Renyi model and the SBM have close to zero attendance when the mean degree is under 10, and universal attendance when the mean degree is above 13.  In between, weekly attendance begins to grow abruptly, but there is high variance with many trials still having no limiting attendance well above what appears to be the critical threshold.
+
+In contrast, as degree increases on the Chung Lu model, attendance grows much more slowly over a larger range of values.  Most of the random networks generated produce identical or close to identical results between trials.
+
+The remainder of this paper will focus on the intermediate region in which some but not all agents attend at steady state.  While we cannot generate random networks with identical degree, we use a target range of $\langle k \rangle \in [10, 11]$ to generate roughly comparable networks in this region.
+
+\begin{figure}
+  \includegraphics[width=0.45\textwidth]{erdos_renyi_degree.png}
+  \includegraphics[width=0.45\textwidth]{sbm_degree.png}
+  \includegraphics[width=0.45\textwidth]{chung_lu_degree.png}
+  \caption{Weekly attendance patterns on random networks with varying mean degree.  $\ell = 3$}
+\end{figure}
+
+\subsection{Variability of Outcomes}
 \begin{figure}[h!]
   \includegraphics[width=0.45\textwidth]{gnp_attendance.png}
   \includegraphics[width=0.45\textwidth]{sbm_attendance.png}
@@ -118,7 +133,7 @@ We can use numerical simulations to gain a stronger understanding of the steady 
   \caption{Weekly attendance pattern on fixed random networks across multiple trials}
 \end{figure}
 
-Figure 1 shows weekly attendance numbers on these random graphs over repeated trials with varying initial conditions.  Attendance converges to a consistent count in most but not all trials.  However, even on the same network with the same number of agents attending at $t=0$, weekly attendance varies between trials.  In both the Erdos-Renyi and SBM simulations, some initial conditions (wiith 30\% of agents attending) led to no agents attending at steady state, while others led to attainment of the maximal fixed point.  In addition, there were intermediate states in which a fraction of the MFP attended while other members of the MFP never attended.  These intermediate states were much more frequent on the SBM versus the Erdos-Renyi model. 
+Figure 2 shows weekly attendance numbers on these random graphs over repeated trials with varying initial conditions.  Attendance converges to a consistent count in most but not all trials.  However, even on the same network with the same number of agents attending at $t=0$, weekly attendance varies between trials.  In both the Erdos-Renyi and SBM simulations, some initial conditions (wiith 30\% of agents attending) led to no agents attending at steady state, while others led to attainment of the maximal fixed point.  In addition, there were intermediate states in which a fraction of the MFP attended while other members of the MFP never attended.  These intermediate states were much more frequent on the SBM versus the Erdos-Renyi model. 
 
 In contrast, the Chung-Lu model leads to much more stable results.  However, results are still not identical between trials, and no trial attained the MFP.  To further test the relationship between heterogeneous degree distribution and variations in steady state attendance, figure 2 plots the standard deviation of the degree distribution against the standard deviation of steady state attendance between multiple trials on fixed networks.  Mean degree was held steady between trials.  This experiment validates the observation that more varied degree sequences lead to more stable attendance patterns, although the plot also highlights the role of randomness in determining whether a network will have multiple reachable steady states.
 
@@ -138,7 +153,7 @@ Further investigation revealed that agents attending alternate weeks were couple
 
 Figure 3 shows the number of distinct agents attending always, sometimes, or never in at least one trial for each of the three random graph models.  The figure shows the contrast between the Chung-Lu model with a heavy-tailed degree distribution, which has around half of the nodes in the Always and Never camp, and very few in Sometimes, compared with the Erdos-Renyi and stochastic block models, which have a much more variabiliity.  Almost all agents are occasionally in both the Always and Never groups depending on the trial, and many more agents attend sometimes.  These results suggest that more homogeneous degree distributions increase the probability of agents engaging in telephone tag behaviors, as well as variability in steady state attendance.
 
-\section{Analysis of Stability on a Lattice}
+\subsection{Stability on a Lattice}
 
 \begin{figure}[h!]
 \includegraphics[width=0.5\textwidth]{one_minus.png}
@@ -164,11 +179,7 @@ However, if an agent attends an extra time in either the universal telephone tag
 
 On these networks and other $\ell + 1$-regular graphs, universal nonattendance is the only stable fixed point.  The fact that attendance can stabilize to a nonzero level in simulations on random networks is only possible because some nodes have degree greater than $\ell + 1$.
 
-\section{Random Noise}
-
-\begin{figure}
-  \includegraphics[width=0.5\textwidth]{mean_degree_v_noise.png}
-\end{figure}
+\subsection{Random Noise}
 
 When each node has degree exactly $\ell + 1$, we have seen that the presence of randomness drives attendance down.  However, with sufficient density of edges, noise could allow otherwise unreachable nodes in the MFP to begin attending.
 

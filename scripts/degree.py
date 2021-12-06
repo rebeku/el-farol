@@ -22,20 +22,21 @@ if __name__=="__main__":
     weekly = []
     mean_deg = []
 
-    k_0 = 3
+    k_0s = [2, 3, 4]
     gammas = np.hstack(
         [np.arange(2.0, 2.4, 0.025), 
         np.arange(2.4,2.7,0.1)
         ])
 
     for gamma in gammas:
-        k = truncated_power_law(gamma, k_0, n, rng, size=size).astype(int)
-        k.sort()
-        A = generate_chung_lu(k, rng)
-        mean_deg.append([A.sum(axis=0).mean()])
-        
-        cnts = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
-        weekly.append(cnts.sum(axis=0)[:batch_size]/950)
+        for k_0 in k_0s:
+            k = truncated_power_law(gamma, k_0, n, rng, size=size).astype(int)
+            k.sort()
+            A = generate_chung_lu(k, rng)
+            mean_deg.append([A.sum(axis=0).mean()])
+            
+            cnts = run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng)
+            weekly.append(cnts.sum(axis=0)[:batch_size]/950)
 
     weekly = np.vstack(weekly)
     mean_deg = np.array(mean_deg)
@@ -47,16 +48,16 @@ if __name__=="__main__":
     plt.xlabel("Mean Degree")
     plt.ylabel("Steady State Attendance")
     plt.title("Chung Lu Model")
-    plt.savefig("chung_lu_degree.png")
+    plt.savefig("images/chung_lu_degree.png")
 
     # Erdos-Renyi Model
-    probs = np.arange(0.026, 0.05, 0.002)
+    probs = np.arange(0.026, 0.05, 0.0005)
 
-    attendance = []
+    weekly = []
     mean_deg = []
 
     for p in probs:
-        G = nx.gnp_random_graph(N, p, seed=rng.choice(1000))
+        G = nx.gnp_random_graph(size, p, seed=rng.choice(1000))
         A = nx.convert_matrix.to_numpy_array(G)
         mean_deg.append([A.sum(axis=0).mean()])
         
@@ -73,15 +74,14 @@ if __name__=="__main__":
     plt.xlabel("Mean Degree")
     plt.ylabel("Steady State Attendance")
     plt.title("Erdos Renyi Model")
-    plt.savefig("erdos_renyi_degree.png")
+    plt.savefig("images/erdos_renyi_degree.png")
 
     # SBM
     # baseline range used to construct the mixing matrix
-    probs = np.arange(0.032, 0.065, 0.002)
+    probs = np.arange(0.042, 0.085, 0.001)
 
-    attendance = []
+    weekly = []
     mean_deg = []
-    nonoise = []
 
     sizes=[100,100,100]
 
@@ -106,4 +106,4 @@ if __name__=="__main__":
     plt.xlabel("Mean Degree")
     plt.ylabel("Steady State Attendance")
     plt.title("SBM")
-    plt.savefig("sbm_degree.png")
+    plt.savefig("images/sbm_degree.png")
