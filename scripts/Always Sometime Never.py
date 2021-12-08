@@ -189,7 +189,7 @@ if __name__ == "__main__":
     label='Never')
 
     plt.xlabel('Random Graph')
-    plt.ylabel('Fraction of Distinct Agents')
+    plt.ylabel('Fraction of MFP')
     plt.title('Proportion of MFP')
     plt.xticks(index + 2*bar_width, ('Erdos\nRenyi', 'Configuration\nModel', 'SBM'))
     plt.legend()

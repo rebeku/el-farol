@@ -90,8 +90,8 @@ Algorithm 1 finds a fixed point of an arbitrary graph $G=(V,E)$.  We show that i
 \begin{algorithm}
   \caption{Find MFP}\label{alg:two}
   \KwData{$G = (V, E)$, $\ell$}
-  $G'(V', E') \gets G(V, E)$;
-  $N \gets 0$;
+  $G'(V', E') \gets G(V, E)$; \\
+  $N \gets 0$; \\
   \While{$V'.size \neq N$}{
     $N \gets $ V'.size\;
     Delete all vertices with degree $< \ell$ \\
@@ -141,7 +141,7 @@ In contrast, the Chung-Lu model leads to much more stable results.  However, res
   \caption{Standard deviation of degree distribution vs. steady state attendance patterns on the Chung-Lu model (left).  Fraction of agents observed attending always, sometimes, or never in at least one trial (right).}
 \end{figure}
 
-In many simulations, the exact same group of agents attended every week, resulting in a fixed point as described in Section 3.  However, all three models had some trials that had limit cycles of period 2.   These limit cycles are the result of coupled agents that reach the threshold dependent on each other's behavior.  If one agent but not the other attends as part of the initial conditions, the two agents will toggle back and forth indefinitely, caught in a game of telephone tag in which they miss running into each other at every timestep.  In some cases, more complex interactions occur, involving more than two agents.
+All three models had some trials with limit cycles of period 2.   These limit cycles are the result of coupled agents that reach the threshold dependent on each other's behavior.  If one agent but not the other attends as part of the initial conditions, the two agents will toggle back and forth indefinitely, caught in a game of telephone tag in which they miss running into each other at every timestep.  In some cases, more complex interactions occur, involving more than two agents.
 
 Figure 3 (right) shows the number of distinct agents attending always, sometimes, or never in at least one trial for each of the three random graph models.  The figure shows the contrast between the Chung-Lu model with a heavy-tailed degree distribution, which has around half of the nodes in the Always and Never camp, and very few in Sometimes, compared with the Erdos-Renyi and stochastic block models, which have a much more variabiliity.  These results suggest that more homogeneous degree distributions increase the probability of agents engaging in telephone tag behaviors, as well as variability in steady state attendance.
 
@@ -155,9 +155,7 @@ Figure 4 shows the extreme case where nodes are arranged in a 2-dimensional latt
 
 \subsection{Random Noise}
 
-When each node has degree exactly $\ell$, we have seen that the presence of randomness drives attendance down.  However, with sufficient density of edges, noise could allow otherwise unreachable nodes in the MFP to begin attending.
-
-To test the impact of noise on random networks, we introduce a new parameter, $\epsilon$ to govern the noisiness of the system.  We define
+When each node has degree exactly $\ell$, we have seen that the presence of randomness drives attendance down.  However, with sufficient density of edges, noise could allow otherwise unreachable nodes in the MFP to begin attending.  To test the impact of noise on random networks, we introduce a new parameter, $\epsilon$ to govern the noisiness of the system.  We define
 
 \begin{equation}
   F'(\vec{x})_i = \begin{cases}
@@ -179,9 +177,7 @@ and set
   \caption{Impact of noise level $\epsilon$ on random graph models}
 \end{figure}
 
-Figure 5 shows the impact of $\epsilon$ on the same three random graph models from section 5.  As usual, the Chung-Lu model with power law degree distribution had little variability between trials, and attendance decreases as $\epsilon$ increases.  On the Erdos-Renyi and SBM experiments, which have homogeneous degree distributions, increasing $\epsilon$ from 0 to around 0.14 increases weekly attendance and decreases the standard deviation between trials.  To make sense of this behavior, we note that nodes in the MFP may come in smaller pockets that are less densely connected to the rest of the network.  Adding noise may allow some otherwise unreachable nodes to begin attendiing. 
-
-As $\epsilon$ continues to grow, there is an abrupt transition after which the standard deviation is close to 0 and attendance begins decreasing.  More work is needed to come to a deeper understanding of why the transition is so abrupt, but at higher $\epsilon$ levels, it appears that all elements of the MFP are reachable.  Those that have sufficient redundancy to withstand the noise attend in the steady state.  
+Figure 5 shows the impact of $\epsilon$ on the same three random graph models from section 5.  As usual, the Chung-Lu model with power law degree distribution had little variability between trials, and attendance decreases as $\epsilon$ increases.  On the Erdos-Renyi and SBM experiments, which have homogeneous degree distributions, increasing $\epsilon$ from 0 to around 0.14 increases weekly attendance and decreases the standard deviation between trials.  To make sense of this behavior, we note that nodes in the MFP may come in smaller pockets that are less densely connected to the rest of the network.  Adding noise may allow some otherwise unreachable nodes to begin attendiing.  As $\epsilon$ continues to grow, there is an abrupt transition after which the standard deviation is close to 0 and attendance begins decreasing.  More work is needed to come to a deeper understanding of why the transition is so abrupt, but at higher $\epsilon$ levels, it appears that all elements of the MFP are reachable.  Those that have sufficient redundancy to withstand the noise attend in the steady state.  
 
 \section{Discussion}
 
@@ -189,7 +185,7 @@ The El Farol Bar problem has traditionally considered a population of agents wit
 
 In this paper, we find that a population of agents all following the same network-based strategy can behave similarly to the system of agents with heterogeneous strategies, with a subset of agents always attending, a subset never attending, and a subset attending periodically.  Furthermore, we have see how the interaction of the threshold, network structure, and random noise can effect the strategy distribution, with higher mean degrees, and, in some regimes increased noise leading to higher rates of attendance, and heterogeneous degree distributions leading to decreased sensitivity to initial conditions and lower rates of telephone tag behaviors.
 
-A network can encode a distribution of strategies across multiple agents, but a natural extension of this work would be to reintroduce the evolutionary or inductive learning component that characterizes previous work on the El Farol bar problem.  One way to do this would be to allow agents to vary their $\ell$ value based on past performance.  Another possibility would be to allow agents to modify the network structure, such as forming new edges if they do not have sufficient friends in attendance, or removing edges if they are encountering congestion.  It could also be interesting to examine the results of these processes on empirical social network datasets, which tend to be much less locally treelike than the random graph models examined.    
+The observations in this paper could help us design a network that would exhibit various strategy distributions from the El Farol Bar problem, but a natural extension of this work would be to reintroduce the evolutionary or inductive learning component that characterizes previous work on the El Farol bar problem.  We could have agents vary their $\ell$ value based on past performance, or allow them to modify network structure, forming new edges if they do not have sufficient friends in attendance, or removing edges if they are encountering congestion.  It could also be interesting to examine the results of these processes on empirical social network datasets, which tend to be much less locally treelike than the random graph models examined.    
 
 \bibliographystyle{plain} % We choose the "plain" reference style
 \bibliography{refs} % Entries are in the refs.bib file

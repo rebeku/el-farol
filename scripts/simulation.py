@@ -4,6 +4,19 @@ import pandas as pd
 
 
 def run_simulation(X, A, n_iter, eps, M, minfriends, minbad, rng):
+    """
+    run_simulation runs *n_iter* timesteps of the simulation
+    with initial conditions *X* and adjacency matrix *A*. 
+
+    The minimum threshold for number of neighbors attending is *minbad*
+    and *rng* is a random number generator, passed in for reproducibility
+    with a random seed.
+    
+    Parameters *M* and *minbad* set the congestion threshold and the
+    local threshold once the congestion threshold has been crossed.  For
+    results used in the paper, *minfriends* = *minbad* and these parameters 
+    are useless.
+    """
     Xs = [X]
 
     for _ in range(n_iter):
@@ -26,6 +39,9 @@ def run_simulation(X, A, n_iter, eps, M, minfriends, minbad, rng):
 
 
 def maximal_fixed_point(G, minfriends):
+    """
+    calculate the maxiimal fixed point of *G*
+    """
     g = G.copy()
     while len(g.nodes) > 0:
         k = g.degree()
@@ -38,6 +54,21 @@ def maximal_fixed_point(G, minfriends):
 
 
 def run_simulation_batch(A, n_iter, eps, M, minfriends, minbad, batch_size, rng):
+    """
+    run_simulation_batch runs *batch size* different simulations using
+    different initial conditions.
+    Each simulation runs *n_iter* timesteps of the simulation
+    with initial conditions *X* and adjacency matrix *A*. 
+
+    The minimum threshold for number of neighbors attending is *minbad*
+    and *rng* is a random number generator, passed in for reproducibility
+    with a random seed.
+    
+    Parameters *M* and *minbad* set the congestion threshold and the
+    local threshold once the congestion threshold has been crossed.  For
+    results used in the paper, *minfriends* = *minbad* and these parameters 
+    are useless.
+    """
     Xnps = []
 
     for i in range(batch_size):
